@@ -14,6 +14,9 @@ using System.IO;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.ComponentModel.Design;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace ytToMp3.Controllers
 {
@@ -38,20 +41,43 @@ namespace ytToMp3.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(string ytLink)
         {
-            //save sessionID and path for file on db
-            var ytdl = new YoutubeDL();
-            ytdl.YoutubeDLPath = "C:\\Users\\madhu\\Desktop\\Megafile\\Software\\yt-dlp.exe";
-            ytdl.FFmpegPath = "C:\\PATH_Programs\\ffmpeg.exe";
-            ytdl.OutputFolder = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
+            string selectedOption = Request.Form["dropdownName"];
+                
+            if (ytLink == null || selectedOption == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                
+                 //save sessionID and path for file on db
+                var ytdl = new YoutubeDL();
+                ytdl.YoutubeDLPath = "C:\\Users\\madhu\\Desktop\\Megafile\\Software\\yt-dlp.exe";
+                ytdl.FFmpegPath = "C:\\PATH_Programs\\ffmpeg.exe";
+                ytdl.OutputFolder = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
 
-            //  download the file to from server to user
-            var res = await ytdl.RunAudioDownload(ytLink, AudioConversionFormat.Mp3);
-            string path = res.Data;
-            string fileName = path.Split('\\').Last();
-            checkDelete(ytdl.OutputFolder);
+               //  download the file to from server to user
+                if(selectedOption == "mp3") { 
+                    var res = await ytdl.RunAudioDownload(ytLink, AudioConversionFormat.Mp3);
+                    string path = res.Data;
+                    string fileName = path.Split('\\').Last();
+                    checkDelete(ytdl.OutputFolder);
+                    return downloadFile(path, fileName);
+                }else if(selectedOption  == "mp4")
+                {
+                    var res = await ytdl.RunVideoDownload(ytLink);
+                    string path = res.Data;
+                    string fileName = path.Split('\\').Last();
+                    checkDelete(ytdl.OutputFolder);
+                    return downloadFile(path, fileName);
+            }
+            return new EmptyResult();
 
-            return downloadFile(path, fileName);
-//            return Content($"Hello {path}");
+
+        }
+
+        protected void buttonClickEvent(object sender, EventArgs e)
+        {
+           
+           
         }
         public void checkDelete(string directoryPath)
         {

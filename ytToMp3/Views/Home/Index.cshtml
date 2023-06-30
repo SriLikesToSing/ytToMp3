@@ -2,12 +2,21 @@
     ViewData["Title"] = "Home Page";
 }
 
+<head>
+    <link href="/css/bootstrap.min1.css" rel="stlesheet" />
+</head>
+
 <div class="text-center">
     <h1 class="display-4">Yt to MP3</h1>
     <form method="POST">
         <input type="text" id="ytLink" name="ytLink" placeholder="Type In Youtube Link Here">
         <input type="submit" value="Submit" />
+        <li class="nav-item dropdown">
+            <select class="nav-link dropdown-toggle" name="dropdownName" id="dropdownId" style="margin: 0 auto;
+    display: block;">
+            <option value="mp3" selected>mp3</option>
+            <option value="mp4">mp4</option>
+        </select>
+    </li>
     </form>
-
-
 </div>
