@@ -47,27 +47,46 @@ namespace ytToMp3.Controllers
                 {
                     return RedirectToAction("Index");
                 }
-                
-                 //save sessionID and path for file on db
-                var ytdl = new YoutubeDL();
-                ytdl.YoutubeDLPath = "C:\\Users\\madhu\\Desktop\\Megafile\\Software\\yt-dlp.exe";
-                ytdl.FFmpegPath = "C:\\PATH_Programs\\ffmpeg.exe";
-                ytdl.OutputFolder = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
 
-               //  download the file to from server to user
-                if(selectedOption == "mp3") { 
-                    var res = await ytdl.RunAudioDownload(ytLink, AudioConversionFormat.Mp3);
-                    string path = res.Data;
-                    string fileName = path.Split('\\').Last();
-                    checkDelete(ytdl.OutputFolder);
-                    return downloadFile(path, fileName);
-                }else if(selectedOption  == "mp4")
-                {
-                    var res = await ytdl.RunVideoDownload(ytLink);
-                    string path = res.Data;
-                    string fileName = path.Split('\\').Last();
-                    checkDelete(ytdl.OutputFolder);
-                    return downloadFile(path, fileName);
+            string filepath2 = Path.GetTempPath();
+            string filepath3 = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
+            string filepath4 = "C:\\home\\site\\wwwroot\\wwwroot\\lib\\links";
+            var tempDirectoryPath = Environment.GetEnvironmentVariable("TEMP");
+
+            string debugPath = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
+
+
+            //save sessionID and path for file on db
+            var ytdl = new YoutubeDL();
+
+            //the problem is with the paths
+            //ytdl.YoutubeDLPath = "C:\\home\\yt-dlp.exe";
+            //ytdl.FFmpegPath = "C:\\home\\ffmpeg.exe";
+            ytdl.YoutubeDLPath = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\yt-dlp.exe";
+            ytdl.FFmpegPath = "C:\\PATH_Programs\\ffmpeg.exe";
+            ytdl.OutputFolder = debugPath;
+
+
+
+            //  download the file to from server to user
+            if (selectedOption == "mp3")
+            {
+                var res = await ytdl.RunAudioDownload(ytLink, AudioConversionFormat.Mp3);
+                string path = res.Data;
+                string fileName = path.Split('\\').Last();
+                //checkDelete(ytdl.OutputFolder);
+                return downloadFile(path, fileName);
+
+                //return Content($"Hello {path}");
+            }
+            else if(selectedOption  == "mp4")
+            {
+                var res = await ytdl.RunVideoDownload(ytLink);
+                string path = res.Data;
+                string fileName = path.Split('\\').Last();
+                //checkDelete(ytdl.OutputFolder);
+                return downloadFile(path, fileName);
+                //return Content($"Hello {selectedOption}");
             }
             return new EmptyResult();
 
