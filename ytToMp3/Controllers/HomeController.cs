@@ -17,6 +17,8 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.ComponentModel.Design;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http;
+
 
 namespace ytToMp3.Controllers
 {
@@ -24,13 +26,14 @@ namespace ytToMp3.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly PhysicalFileProvider _fileProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             string rootPath = Directory.GetCurrentDirectory();
             _fileProvider = new PhysicalFileProvider(rootPath);
-
+            _httpContextAccessor = httpContextAccessor;
         }
         [HttpGet]
         public IActionResult Index()
@@ -48,46 +51,46 @@ namespace ytToMp3.Controllers
                     return RedirectToAction("Index");
                 }
 
-            string filepath2 = Path.GetTempPath();
-            string filepath3 = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
-            string filepath4 = "C:\\home\\site\\wwwroot\\wwwroot\\lib\\links";
-            var tempDirectoryPath = Environment.GetEnvironmentVariable("TEMP");
-
-            string debugPath = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
+//            string debugPath = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\links";
 
 
-            //save sessionID and path for file on db
             var ytdl = new YoutubeDL();
 
             //the problem is with the paths
             //ytdl.YoutubeDLPath = "C:\\home\\yt-dlp.exe";
             //ytdl.FFmpegPath = "C:\\home\\ffmpeg.exe";
-            ytdl.YoutubeDLPath = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\yt-dlp.exe";
-            ytdl.FFmpegPath = "C:\\PATH_Programs\\ffmpeg.exe";
-            ytdl.OutputFolder = debugPath;
+            //ytdl.YoutubeDLPath = "C:\\Users\\madhu\\Desktop\\Megafile\\programming\\projects\\ytToMp3\\wwwroot\\lib\\yt-dlp.exe";
+            //ytdl.FFmpegPath = "C:\\PATH_Programs\\ffmpeg.exe";
+
+            //                        ytdl.YoutubeDLPath = "wwwroot\\lib\\yt-dlp.exe";
+            //                       ytdl.FFmpegPath = "wwwroot\\lib\\ffmpeg.exe";
+            //                      ytdl.OutputFolder = "wwwroot\\lib\\links";
 
 
+            ytdl.YoutubeDLPath = "yt-dlp_linux";
+            ytdl.FFmpegPath = "ffmpeg";
+            ytdl.OutputFolder = "/data/links";
 
             //  download the file to from server to user
             if (selectedOption == "mp3")
             {
                 var res = await ytdl.RunAudioDownload(ytLink, AudioConversionFormat.Mp3);
                 string path = res.Data;
-                string fileName = path.Split('\\').Last();
-                //checkDelete(ytdl.OutputFolder);
+                string fileName = path.Split('/').Last();
                 return downloadFile(path, fileName);
-
                 //return Content($"Hello {path}");
+
             }
             else if(selectedOption  == "mp4")
             {
                 var res = await ytdl.RunVideoDownload(ytLink);
                 string path = res.Data;
-                string fileName = path.Split('\\').Last();
+                string fileName = path.Split('/').Last();
                 //checkDelete(ytdl.OutputFolder);
                 return downloadFile(path, fileName);
-                //return Content($"Hello {selectedOption}");
+                //return Content($"Hello {path}");
             }
+
             return new EmptyResult();
 
 
@@ -102,7 +105,7 @@ namespace ytToMp3.Controllers
         {
                 //clear storage every few days or so
                 (from f in new DirectoryInfo(directoryPath).GetFiles()
-                 where f.CreationTime < DateTime.Now.Subtract(TimeSpan.FromDays(3))
+                 where f.CreationTime < DateTime.Now.Subtract(TimeSpan.FromMinutes(5))
                  select f
                  ).ToList()
                     .ForEach(f => f.Delete());
@@ -118,6 +121,7 @@ namespace ytToMp3.Controllers
                 var br = new BinaryReader(fs);
                 long numBytes = new FileInfo(fileLocation).Length;
                 var buff = br.ReadBytes((int)numBytes);
+                checkDelete("/data/links");
                 return File(buff, "audio/mpeg", fileName);
             }
             return null;

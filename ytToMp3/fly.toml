@@ -1,0 +1,21 @@
+# fly.toml app configuration file generated for yttomp3 on 2023-09-11T20:19:55-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "yttomp3"
+primary_region = "lax"
+
+[build]
+
+[mounts]
+  source="yttomp3_data"
+  destination="/data"
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]

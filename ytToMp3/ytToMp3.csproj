@@ -18,12 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\lib\links\" />
+    <None Include="wwwroot\lib\ffmpeg.exe" />
+    <None Include="wwwroot\lib\yt-dlp.exe" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\lib\ffmpeg.exe" />
-    <None Include="wwwroot\lib\yt-dlp.exe" />
+    <Folder Include="wwwroot\links\" />
   </ItemGroup>
 
 </Project>
