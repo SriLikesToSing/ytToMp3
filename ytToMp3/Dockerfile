@@ -23,4 +23,4 @@ COPY yt-dlp_linux /app/
 COPY ffmpeg /app
 COPY --from=publish /app/publish .
 USER root
-ENTRYPOINT ["dotnet", "ytToMp3.dll", "--environment=Development"]
+ENTRYPOINT ["dotnet", "ytToMp3.dll", "--environment=Production"]
